@@ -47,12 +47,19 @@ spring.jpa.hibernate.ddl-auto=validate
 - `db/changelog/changes/v1.0.1-insert-test-data.sql` (наполнение тестовыми данными с блоком `--rollback`)
 
 ### 3.6. Рефакторинг слоя доступа к данным (Repository)
-Удален кастомный класс `PersonDao`. Создан интерфейс `PersonRepository`, расширяющий `JpaRepository<Person, PersonId>`:
+Удален кастомный класс `PersonDao`. Создан интерфейс `PersonRepository`, расширяющий `JpaRepository<Person, PersonId>`.
+Поскольку первичный ключ является составным (`@EmbeddedId`), для корректного обращения к вложенным полям (`name`, `surname`, `age`) использована аннотация `@Query` с явным указанием JPQL-путей:
+
 ```java
+@Repository
 public interface PersonRepository extends JpaRepository<Person, PersonId> {
-    List<Person> findByCityOfLiving(String city);
-    List<Person> findByAgeLessThanOrderByAgeAsc(Integer age);
-    Optional<Person> findByNameAndSurname(String name, String surname);
+  List<Person> findByCityOfLiving(String city);
+
+  @Query("SELECT p FROM Person p WHERE p.id.age < :age ORDER BY p.id.age ASC")
+  List<Person> findByAgeLessThanOrderByAgeAsc(@Param("age") Integer age);
+
+  @Query("SELECT p FROM Person p WHERE p.id.name = :name AND p.id.surname = :surname")
+  Optional<Person> findByNameAndSurname(@Param("name") String name, @Param("surname") String surname);
 }
 ```
 Spring Data JPA автоматически генерирует JPQL-запросы на основе имен методов (Query Derivation).
