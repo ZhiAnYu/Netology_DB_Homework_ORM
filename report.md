@@ -4,7 +4,7 @@
 Рефакторинг приложения «Слой DAO с Hibernate» с переходом от нативного использования `EntityManager` к декларативным Spring Data JPA Repositories. Реализация методов-запросов (Query Derivation) для CRUD-операций, фильтрации и сортировки. Интеграция Liquibase для версионирования схемы БД и добавление `docker-compose.yml` для контейнеризации СУБД.
 
 ## 2. Использованные технологии и инструменты
-- **ОС:** Windows 10/11 (с поддержкой Docker Desktop / WSL2)
+- **ОС:** Windows 10 (WSL2)
 - **Среда разработки:** IntelliJ IDEA Community Edition 2025
 - **Язык программирования:** Java 17 (OpenJDK 17.0.19)
 - **Сборщик проектов:** Apache Maven
@@ -21,10 +21,6 @@
 ## 3. Выполненные шаги
 
 ### 3.1. Создание feature-ветки
-В корневой директории проекта выполнена команда:
-```bash
-git checkout -b jpa-repository
-```
 Вся дальнейшая разработка велась в изолированной ветке.
 
 ### 3.2. Добавление зависимостей
@@ -43,7 +39,6 @@ spring.sql.init.mode=never
 spring.liquibase.change-log=classpath:db/changelog/db.changelog-master.yaml
 spring.jpa.hibernate.ddl-auto=validate
 ```
-Ключевой момент: `spring.sql.init.mode=never` отключает стандартный механизм `schema.sql`/`data.sql`, чтобы избежать конфликта с Liquibase. `ddl-auto=validate` гарантирует, что Hibernate только проверяет соответствие Entity существующей схеме, созданной миграциями.
 
 ### 3.5. Создание структуры миграций Liquibase
 Создана структура директорий и файлы миграций:
